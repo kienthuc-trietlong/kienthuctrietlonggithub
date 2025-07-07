@@ -119,6 +119,44 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.transform = 'scale(1)';
         this.style.background = '#17a2b8';
     });
+
+    // Scrollspy + smooth scroll for sidebar TOC
+    document.querySelectorAll('.sidebar a[href^="#"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Optional: update hash in URL
+                history.replaceState(null, '', this.getAttribute('href'));
+            }
+        });
+    });
+
+    // Scrollspy
+    const sections = Array.from(document.querySelectorAll('.content h2[id]'));
+    const navLinksSidebar = Array.from(document.querySelectorAll('.sidebar a[href^="#"]'));
+
+    function onScroll() {
+        let scrollPos = window.scrollY || document.documentElement.scrollTop;
+        let offset = 120; // header + margin
+        let currentId = '';
+        for (let i = 0; i < sections.length; i++) {
+            const sec = sections[i];
+            if (sec.offsetTop - offset <= scrollPos) {
+                currentId = sec.id;
+            }
+        }
+        navLinksSidebar.forEach(link => {
+            if (link.getAttribute('href') === '#' + currentId) {
+                link.classList.add('active-toc');
+            } else {
+                link.classList.remove('active-toc');
+            }
+        });
+    }
+    window.addEventListener('scroll', onScroll);
+    onScroll();
 });
 
 // Utility function to show notifications
